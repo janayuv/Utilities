@@ -1,4 +1,8 @@
-﻿namespace utilities
+﻿using System.Windows.Forms;
+using System;
+using Microsoft.Office.Tools.Ribbon;
+
+namespace utilities
 {
     partial class UtilitiesRibbon
     {
@@ -27,6 +31,7 @@
             this.btnConvertTextToNumbers = this.Factory.CreateRibbonButton();
             this.btnConvertNumbersToText = this.Factory.CreateRibbonButton();
             this.btnChangeCase = this.Factory.CreateRibbonButton();
+            this.btnTrimText = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.SuspendLayout();
@@ -45,6 +50,7 @@
             this.group1.Items.Add(this.btnConvertTextToNumbers);
             this.group1.Items.Add(this.btnConvertNumbersToText);
             this.group1.Items.Add(this.btnChangeCase);
+            this.group1.Items.Add(this.btnTrimText);
             this.group1.Label = "Operations";
             this.group1.Name = "group1";
             // 
@@ -78,6 +84,12 @@
             this.btnChangeCase.Name = "btnChangeCase";
             this.btnChangeCase.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnChangeCase_Click);
             // 
+            // btnTrimText
+            // 
+            this.btnTrimText.Label = "Trim Text";
+            this.btnTrimText.Name = "btnTrimText";
+            this.btnTrimText.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnTrimText_Click);
+            // 
             // UtilitiesRibbon
             // 
             this.Name = "UtilitiesRibbon";
@@ -99,9 +111,11 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnConvertTextToNumbers;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnConvertNumbersToText;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnChangeCase;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton btnTrimText;
 
+        // Event handler for btnTrimText
+        
     }
-
     partial class ThisRibbonCollection
     {
         internal UtilitiesRibbon UtilitiesRibbon

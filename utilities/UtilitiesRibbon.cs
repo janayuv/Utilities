@@ -56,5 +56,18 @@ namespace utilities
             changeCaseForm.Show();
         }
 
+        // Event handler for btnTrimText
+        private void btnTrimText_Click(object sender, RibbonControlEventArgs e)
+        {
+            try
+            {
+                TrimTextForm trimTextForm = new TrimTextForm();
+                trimTextForm.ShowDialog(); // This opens the form as a modal dialog
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 }

@@ -226,6 +226,12 @@
     <Compile Include="SequenceForm.Designer.cs">
       <DependentUpon>SequenceForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="TrimTextForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TrimTextForm.Designer.cs">
+      <DependentUpon>TrimTextForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UtilitiesRibbon.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -246,6 +252,9 @@
     </Compile>
     <EmbeddedResource Include="SequenceForm.resx">
       <DependentUpon>SequenceForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrimTextForm.resx">
+      <DependentUpon>TrimTextForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UtilitiesRibbon.resx">
       <DependentUpon>UtilitiesRibbon.cs</DependentUpon>
