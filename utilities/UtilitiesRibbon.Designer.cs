@@ -26,6 +26,7 @@
             this.btnColorDuplicates = this.Factory.CreateRibbonButton();
             this.btnConvertTextToNumbers = this.Factory.CreateRibbonButton();
             this.btnConvertNumbersToText = this.Factory.CreateRibbonButton();
+            this.btnChangeCase = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.SuspendLayout();
@@ -43,6 +44,7 @@
             this.group1.Items.Add(this.btnColorDuplicates);
             this.group1.Items.Add(this.btnConvertTextToNumbers);
             this.group1.Items.Add(this.btnConvertNumbersToText);
+            this.group1.Items.Add(this.btnChangeCase);
             this.group1.Label = "Operations";
             this.group1.Name = "group1";
             // 
@@ -70,6 +72,12 @@
             this.btnConvertNumbersToText.Name = "btnConvertNumbersToText";
             this.btnConvertNumbersToText.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnConvertNumbersToText_Click);
             // 
+            // btnChangeCase
+            // 
+            this.btnChangeCase.Label = "Change Case";
+            this.btnChangeCase.Name = "btnChangeCase";
+            this.btnChangeCase.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnChangeCase_Click);
+            // 
             // UtilitiesRibbon
             // 
             this.Name = "UtilitiesRibbon";
@@ -84,13 +92,14 @@
 
         }
 
-
         internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group1;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnInsertSequence;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnColorDuplicates;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnConvertTextToNumbers;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnConvertNumbersToText;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton btnChangeCase;
+
     }
 
     partial class ThisRibbonCollection

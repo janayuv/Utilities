@@ -50,5 +50,11 @@ namespace utilities
             }
         }
 
+        private void btnChangeCase_Click(object sender, RibbonControlEventArgs e)
+        {
+            ChangeCaseForm changeCaseForm = new ChangeCaseForm();
+            changeCaseForm.Show();
+        }
+
     }
 }

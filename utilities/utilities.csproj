@@ -208,6 +208,12 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="ChangeCaseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChangeCaseForm.Designer.cs">
+      <DependentUpon>ChangeCaseForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataConverterHelper.cs" />
     <Compile Include="ExcelHelper.cs" />
     <Compile Include="Program.cs" />
@@ -226,6 +232,9 @@
     <Compile Include="UtilitiesRibbon.Designer.cs">
       <DependentUpon>UtilitiesRibbon.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="ChangeCaseForm.resx">
+      <DependentUpon>ChangeCaseForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
