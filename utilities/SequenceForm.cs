@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Runtime.InteropServices;
 
 namespace utilities
 {
@@ -27,48 +28,66 @@ namespace utilities
             btnGeneratePreview.Click += btnGeneratePreview_Click;
             btnOK.Click += btnOK_Click;
             btnCancel.Click += btnCancel_Click;
+
+            // Validate inputs dynamically
+            txtStartNumber.TextChanged += (s, e) => ValidateInputs();
+            txtIncrement.TextChanged += (s, e) => ValidateInputs();
+            comboBoxFillOrder.SelectedIndexChanged += (s, e) => ValidateInputs();
         }
+
+        private void SequenceForm_Load(object sender, EventArgs e)
+        {
+            // Set default fill order to "Fill Horizontally"
+            if (comboBoxFillOrder.Items.Count == 0) // Ensure items are not already added
+            {
+                comboBoxFillOrder.Items.Add("Fill Vertically");
+                comboBoxFillOrder.Items.Add("Fill Horizontally");
+            }
+            comboBoxFillOrder.SelectedItem = "Fill Horizontally"; // Default value
+
+            // Set default number of digits to 0
+            if (string.IsNullOrWhiteSpace(txtDigits.Text))
+                txtDigits.Text = "0";
+
+            ValidateInputs(); // Ensure inputs are valid on load
+        }
+
         private void btnGeneratePreview_Click(object sender, EventArgs e)
         {
             try
             {
-                // Read user inputs
-                StartNumber = int.Parse(txtStartNumber.Text);
-                Increment = int.Parse(txtIncrement.Text);
-                NumberOfDigits = int.Parse(txtDigits.Text);
+                // Use local variables to store parsed values
+                int startNumber, increment, numberOfDigits;
+
+                if (!int.TryParse(txtStartNumber.Text, out startNumber))
+                    throw new Exception("Invalid start number.");
+                if (!int.TryParse(txtIncrement.Text, out increment))
+                    throw new Exception("Invalid increment value.");
+                if (!int.TryParse(txtDigits.Text, out numberOfDigits))
+                    throw new Exception("Invalid number of digits.");
+
+                // Assign to properties after successful parsing
+                StartNumber = startNumber;
+                Increment = increment;
+                NumberOfDigits = numberOfDigits;
+
                 Prefix = txtPrefix.Text;
                 Suffix = txtSuffix.Text;
 
-                // Determine the fill order based on comboBox selection
-                if (comboBoxFillOrder.SelectedItem.ToString() == "Fill Vertically")
-                {
-                    SequenceFillOrder = FillOrder.Vertical;
-                }
-                else
-                {
-                    SequenceFillOrder = FillOrder.Horizontal;
-                }
+                if (comboBoxFillOrder.SelectedItem == null)
+                    throw new Exception("Fill order is not selected.");
 
-                // Get the number of cells selected by the user
+                SequenceFillOrder = comboBoxFillOrder.SelectedItem.ToString() == "Fill Vertically"
+                    ? FillOrder.Vertical
+                    : FillOrder.Horizontal;
+
+                // Generate preview
+                listBoxPreview.Items.Clear();
                 int numberOfEntries = 10; // Default number of entries in preview
-                if (SequenceFillOrder == FillOrder.Vertical)
-                {
-                    numberOfEntries = 10; // Preview vertically by default (you can change this logic)
-                }
-                else if (SequenceFillOrder == FillOrder.Horizontal)
-                {
-                    numberOfEntries = 10; // Preview horizontally by default (you can change this logic)
-                }
-
-                // Generate a sequence preview
-                listBoxPreview.Items.Clear(); // Clear previous preview
-                for (int i = 0; i < numberOfEntries; i++) // Preview based on selected range
+                for (int i = 0; i < numberOfEntries; i++)
                 {
                     int currentNumber = StartNumber + (i * Increment);
-
-                    // Apply padding logic: if NumberOfDigits is 0, do not pad
                     string formattedNumber = Prefix + currentNumber.ToString().PadLeft(NumberOfDigits > 0 ? NumberOfDigits : currentNumber.ToString().Length, '0') + Suffix;
-
                     listBoxPreview.Items.Add(formattedNumber);
                 }
             }
@@ -78,7 +97,6 @@ namespace utilities
             }
         }
 
-        // Handle OK button click to save inputs and close the form
         private void btnOK_Click(object sender, EventArgs e)
         {
             try
@@ -102,42 +120,22 @@ namespace utilities
                     return;
                 }
 
-                // Get the user inputs
+                // Get only visible cells in the selected range
+                Excel.Range visibleCells = selectedRange.SpecialCells(Excel.XlCellType.xlCellTypeVisible);
+
+                // Initialize the sequence variables
                 int currentNumber = StartNumber;
-                int increment = Increment;
 
-                // Get the number of rows and columns from the selected range
-                int numRows = selectedRange.Rows.Count;
-                int numCols = selectedRange.Columns.Count;
-
-                // Check if we need to fill vertically or horizontally
-                for (int i = 0; i < numRows; i++)  // Loop through rows
+                // Loop through visible cells and apply the sequence
+                foreach (Excel.Range cell in visibleCells)
                 {
-                    for (int j = 0; j < numCols; j++)  // Loop through columns
-                    {
-                        // Apply padding logic if necessary
-                        string formattedNumber = Prefix + currentNumber.ToString().PadLeft(NumberOfDigits > 0 ? NumberOfDigits : currentNumber.ToString().Length, '0') + Suffix;
-
-                        // If the user selected cells horizontally
-                        if (SequenceFillOrder == FillOrder.Horizontal)
-                        {
-                            // Fill cells horizontally: Move across columns in the same row
-                            selectedRange.Cells[i + 1, j + 1].Value = formattedNumber;
-                        }
-                        // If the user selected cells vertically
-                        else if (SequenceFillOrder == FillOrder.Vertical)
-                        {
-                            // Fill cells vertically: Move down rows in the same column
-                            selectedRange.Cells[j + 1, i + 1].Value = formattedNumber;
-                        }
-
-                        // Increment the number for the next cell
-                        currentNumber += increment;
-                    }
+                    string formattedNumber = Prefix + currentNumber.ToString().PadLeft(NumberOfDigits > 0 ? NumberOfDigits : currentNumber.ToString().Length, '0') + Suffix;
+                    cell.Value = formattedNumber;
+                    currentNumber += Increment;
                 }
 
                 // Show a confirmation message
-                MessageBox.Show("Sequence inserted!");
+                MessageBox.Show("Sequence inserted into visible cells!");
 
                 // Close the form
                 this.DialogResult = DialogResult.OK;
@@ -145,10 +143,9 @@ namespace utilities
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error inserting sequence: " + ex.Message);
+                MessageBox.Show("Error inserting sequence: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
         private void btnCancel_Click(object sender, EventArgs e)
         {
             // Handle Cancel button click
@@ -156,18 +153,12 @@ namespace utilities
             this.Close();
         }
 
-        private void SequenceForm_Load(object sender, EventArgs e)
+        private void ValidateInputs()
         {
-            // Set default fill order to "Fill Vertically"
-            if (comboBoxFillOrder.Items.Count == 0) // Ensure items are not already added
-            {
-                comboBoxFillOrder.Items.Add("Fill Vertically");
-                comboBoxFillOrder.Items.Add("Fill Horizontally");
-            }
-            comboBoxFillOrder.SelectedItem = "Fill Horizontally"; // Default value
-
-            // Set default number of digits to 0
-            txtDigits.Text = "0"; // Default value is 0
+            // Enable OK button only if all inputs are valid
+            btnOK.Enabled = !string.IsNullOrWhiteSpace(txtStartNumber.Text) &&
+                            !string.IsNullOrWhiteSpace(txtIncrement.Text) &&
+                            comboBoxFillOrder.SelectedItem != null;
         }
     }
 }
