@@ -198,7 +198,7 @@
             this.Load += new System.EventHandler(this.SequenceForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
-            
+
         }
 
         #endregion
