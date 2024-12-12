@@ -1,5 +1,4 @@
 ﻿using System.Windows.Forms;
-using System;
 using Microsoft.Office.Tools.Ribbon;
 
 namespace utilities
@@ -32,6 +31,7 @@ namespace utilities
             this.btnConvertNumbersToText = this.Factory.CreateRibbonButton();
             this.btnChangeCase = this.Factory.CreateRibbonButton();
             this.btnTrimText = this.Factory.CreateRibbonButton();
+            this.btnExportToPDF = this.Factory.CreateRibbonButton(); // New button
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.SuspendLayout();
@@ -51,6 +51,7 @@ namespace utilities
             this.group1.Items.Add(this.btnConvertNumbersToText);
             this.group1.Items.Add(this.btnChangeCase);
             this.group1.Items.Add(this.btnTrimText);
+            this.group1.Items.Add(this.btnExportToPDF); // Add the new button here
             this.group1.Label = "Operations";
             this.group1.Name = "group1";
             // 
@@ -90,6 +91,12 @@ namespace utilities
             this.btnTrimText.Name = "btnTrimText";
             this.btnTrimText.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnTrimText_Click);
             // 
+            // btnExportToPDF
+            // 
+            this.btnExportToPDF.Label = "Export to PDF"; // Label for the new button
+            this.btnExportToPDF.Name = "btnExportToPDF";
+            this.btnExportToPDF.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnExportToPDF_Click);
+            // 
             // UtilitiesRibbon
             // 
             this.Name = "UtilitiesRibbon";
@@ -112,9 +119,8 @@ namespace utilities
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnConvertNumbersToText;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnChangeCase;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnTrimText;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton btnExportToPDF; // Internal reference for the new button
 
-        // Event handler for btnTrimText
-        
     }
     partial class ThisRibbonCollection
     {

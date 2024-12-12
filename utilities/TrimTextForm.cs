@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -41,6 +40,7 @@ namespace utilities
             else
             {
                 MessageBox.Show("Please select an option.", "No Option Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
 
             MessageBox.Show("Operation completed successfully.", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -57,9 +57,12 @@ namespace utilities
         {
             foreach (Excel.Range cell in selectedRange.Cells)
             {
-                if (cell.Value2 != null && cell.Value2 is string)
+                if (cell.Value2 != null)
                 {
-                    cell.Value2 = cell.Value2.ToString().Trim();
+                    if (cell.Value2 is string)
+                    {
+                        cell.Value2 = cell.Value2.ToString().Trim();
+                    }
                 }
             }
         }
@@ -69,10 +72,13 @@ namespace utilities
         {
             foreach (Excel.Range cell in selectedRange.Cells)
             {
-                if (cell.Value2 != null && cell.Value2 is string)
+                if (cell.Value2 != null)
                 {
-                    string cleanedText = System.Text.RegularExpressions.Regex.Replace(cell.Value2.ToString().Trim(), @"\s+", " ");
-                    cell.Value2 = cleanedText;
+                    if (cell.Value2 is string)
+                    {
+                        string cleanedText = System.Text.RegularExpressions.Regex.Replace(cell.Value2.ToString().Trim(), @"\s+", " ");
+                        cell.Value2 = cleanedText;
+                    }
                 }
             }
         }
@@ -80,103 +86,83 @@ namespace utilities
         // Delete a specified number of leading characters
         private void DeleteLeadingCharacters(Excel.Range selectedRange)
         {
-            // Validate input from the TextBox
-            int numberOfChars;
-            if (int.TryParse(txtNumberOfCharacters.Text, out numberOfChars) && numberOfChars > 0)
+            if (ValidateNumberInput(out int numberOfChars))
             {
                 foreach (Excel.Range cell in selectedRange.Cells)
                 {
-                    if (cell.Value2 != null && cell.Value2 is string)
+                    if (cell.Value2 != null)
                     {
-                        string newValue = cell.Value2.ToString();
-                        if (newValue.Length > numberOfChars)
+                        if (cell.Value2 is string)
                         {
-                            newValue = newValue.Substring(numberOfChars);
+                            string newValue = TruncateString(cell.Value2.ToString(), numberOfChars, isLeading: true);
+                            cell.Value2 = newValue;
                         }
-                        cell.Value2 = newValue;
+                        else if (IsConvertibleToString(cell.Value2))
+                        {
+                            string newValue = TruncateString(cell.Value2.ToString(), numberOfChars, isLeading: true);
+                            cell.Value2 = newValue;
+                        }
                     }
                 }
-            }
-            else
-            {
-                MessageBox.Show("Please enter a valid number of characters to remove.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
         // Delete a specified number of ending characters
         private void DeleteEndingCharacters(Excel.Range selectedRange)
         {
-            // Validate input from the TextBox
-            int numberOfChars;
-            if (int.TryParse(txtNumberOfCharacters.Text, out numberOfChars) && numberOfChars > 0)
+            if (ValidateNumberInput(out int numberOfChars))
             {
                 foreach (Excel.Range cell in selectedRange.Cells)
                 {
-                    if (cell.Value2 != null && cell.Value2 is string)
+                    if (cell.Value2 != null)
                     {
-                        string newValue = cell.Value2.ToString();
-                        if (newValue.Length > numberOfChars)
+                        if (cell.Value2 is string)
                         {
-                            newValue = newValue.Substring(0, newValue.Length - numberOfChars);
+                            string newValue = TruncateString(cell.Value2.ToString(), numberOfChars, isLeading: false);
+                            cell.Value2 = newValue;
                         }
-                        cell.Value2 = newValue;
+                        else if (IsConvertibleToString(cell.Value2))
+                        {
+                            string newValue = TruncateString(cell.Value2.ToString(), numberOfChars, isLeading: false);
+                            cell.Value2 = newValue;
+                        }
                     }
                 }
+            }
+        }
+
+        // Validate input from the TextBox
+        private bool ValidateNumberInput(out int numberOfChars)
+        {
+            if (int.TryParse(txtNumberOfCharacters.Text, out numberOfChars) && numberOfChars > 0)
+            {
+                return true;
             }
             else
             {
                 MessageBox.Show("Please enter a valid number of characters to remove.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                numberOfChars = 0;
+                return false;
             }
         }
 
+        // Truncate a string
         private string TruncateString(string input, int numberOfChars, bool isLeading)
         {
             if (isLeading)
-                return input.Length > numberOfChars ? input.Substring(numberOfChars) : input;
+            {
+                return input.Length > numberOfChars ? input.Substring(numberOfChars) : string.Empty;
+            }
             else
-                return input.Length > numberOfChars ? input.Substring(0, input.Length - numberOfChars) : input;
+            {
+                return input.Length > numberOfChars ? input.Substring(0, input.Length - numberOfChars) : string.Empty;
+            }
         }
 
-        // Helper method to get number of characters from user
-        private int GetNumberInput(string prompt)
+        // Check if an object is convertible to a string
+        private bool IsConvertibleToString(object value)
         {
-            using (var inputBox = new Form())
-            {
-                var label = new Label() { Left = 20, Top = 20, Text = prompt };
-                var textBox = new TextBox() { Left = 20, Top = 50, Width = 200 };
-                var okButton = new Button() { Text = "OK", Left = 20, Width = 75, Top = 80 };
-                var cancelButton = new Button() { Text = "Cancel", Left = 120, Width = 75, Top = 80 };
-
-                inputBox.Controls.Add(label);
-                inputBox.Controls.Add(textBox);
-                inputBox.Controls.Add(okButton);
-                inputBox.Controls.Add(cancelButton);
-
-                okButton.DialogResult = DialogResult.OK;
-                cancelButton.DialogResult = DialogResult.Cancel;
-                inputBox.StartPosition = FormStartPosition.CenterScreen;
-
-                inputBox.AcceptButton = okButton;
-                inputBox.CancelButton = cancelButton;
-
-                if (inputBox.ShowDialog() == DialogResult.OK)
-                {
-                    int number;
-                    if (int.TryParse(textBox.Text, out number))
-                    {
-                        return number;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Invalid number entered. Please try again.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return 0;
-                    }
-                }
-                else
-                {
-                    return 0;
-                }
-            }
+            return value is DateTime || value is double || value is int || value is decimal;
         }
     }
 }

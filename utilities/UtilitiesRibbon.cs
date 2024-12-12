@@ -69,5 +69,28 @@ namespace utilities
                 MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void btnExportToPDF_Click(object sender, RibbonControlEventArgs e)
+        {
+            try
+            {
+                // Get the selected range
+                Excel.Range selectedRange = Globals.ThisAddIn.Application.Selection as Excel.Range;
+
+                if (selectedRange != null)
+                {
+                    // Use the helper class to export the range to PDF
+                    PdfExportHelper.ExportRangeToPdf(selectedRange);
+                }
+                else
+                {
+                    MessageBox.Show("Please select a valid range.", "Invalid Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred while exporting to PDF:\n\n{ex.Message}", "Export Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 }

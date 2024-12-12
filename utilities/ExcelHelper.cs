@@ -30,46 +30,53 @@ namespace utilities
                 Excel.XlRgbColor.rgbKhaki
             };
 
-            var colorDict = new Dictionary<string, object>();
+            // Step 1: Read all cell values into a dictionary
+            object[,] values = selectedRange.Value2;
             var countDict = new Dictionary<string, int>();
 
-            foreach (Excel.Range cell in selectedRange)
+            for (int row = 1; row <= values.GetLength(0); row++)
             {
-                if (cell.Value2 != null && !string.IsNullOrEmpty(cell.Value2.ToString()))
+                for (int col = 1; col <= values.GetLength(1); col++)
                 {
-                    string value = cell.Value2.ToString();
-                    if (countDict.ContainsKey(value))
-                        countDict[value]++;
-                    else
-                        countDict.Add(value, 1);
+                    var cellValue = values[row, col]?.ToString();
+                    if (!string.IsNullOrEmpty(cellValue))
+                    {
+                        if (countDict.ContainsKey(cellValue))
+                            countDict[cellValue]++;
+                        else
+                            countDict[cellValue] = 1;
+                    }
                 }
             }
 
+            // Step 2: Assign colors to duplicates
+            var colorDict = new Dictionary<string, object>();
             int colorIndex = 0;
-            foreach (Excel.Range cell in selectedRange)
+
+            for (int row = 1; row <= values.GetLength(0); row++)
             {
-                if (cell.Value2 != null && !string.IsNullOrEmpty(cell.Value2.ToString()))
+                for (int col = 1; col <= values.GetLength(1); col++)
                 {
-                    string value = cell.Value2.ToString();
-                    if (countDict[value] > 1)
+                    var cellValue = values[row, col]?.ToString();
+                    if (!string.IsNullOrEmpty(cellValue) && countDict[cellValue] > 1)
                     {
-                        if (!colorDict.ContainsKey(value))
+                        if (!colorDict.ContainsKey(cellValue))
                         {
                             if (colorIndex < colorList.Count)
                             {
-                                colorDict[value] = colorList[colorIndex++];
+                                colorDict[cellValue] = colorList[colorIndex++];
                             }
                             else
                             {
-                                colorDict[value] = GenerateUniqueColor(colorIndex++); // Generate dynamic color
+                                colorDict[cellValue] = GenerateUniqueColor(colorIndex++);
                             }
                         }
 
-                        cell.Interior.Color = colorDict[value];
+                        selectedRange.Cells[row, col].Interior.Color = colorDict[cellValue];
                     }
                     else
                     {
-                        cell.Interior.ColorIndex = Excel.Constants.xlNone;
+                        selectedRange.Cells[row, col].Interior.ColorIndex = Excel.Constants.xlNone;
                     }
                 }
             }
